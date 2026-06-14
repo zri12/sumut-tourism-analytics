@@ -1,5 +1,0 @@
-{
-  "description": "Hasil clustering dihitung otomatis dari tourism.json melalui src/lib/kmeans.js.",
-  "k": 3,
-  "labels": ["Sepi", "Sedang", "Ramai"]
-}

@@ -38,7 +38,6 @@ setiap kali file Excel diperbarui.
 ```text
 public/
   datasets/       # File Excel asli
-  images/         # Aset gambar publik
 src/
   app/            # Route dan layout Next.js
   components/     # Komponen UI reusable
@@ -46,8 +45,7 @@ src/
   data/           # Dataset JSON
   lib/            # K-Means, normalisasi, statistik, rekomendasi
   utils/          # Formatter
-docs/             # Dokumentasi project
-UI/               # Referensi desain awal
+scripts/          # Konversi Excel menjadi JSON
 ```
 
 ## Dataset dan K-Means
