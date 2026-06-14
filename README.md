@@ -58,7 +58,24 @@ Ramai berdasarkan rata-rata jumlah kunjungan.
 
 ## Deployment Vercel
 
-1. Push project ke repository GitHub.
-2. Import repository melalui Vercel.
-3. Gunakan framework preset **Next.js**.
-4. Jalankan deployment tanpa konfigurasi tambahan.
+Project sudah dikonfigurasi melalui `vercel.json`:
+
+- Framework: **Next.js**
+- Install command: `npm ci`
+- Build command: `npm run build`
+- Node.js: `24.x`
+- Output directory: otomatis dikelola oleh preset Next.js
+
+Langkah deployment:
+
+1. Buka [Vercel](https://vercel.com/new).
+2. Import repository `zri12/sumut-tourism-analytics`.
+3. Pastikan **Root Directory** adalah root repository.
+4. Biarkan Framework Preset sebagai **Next.js**.
+5. Tidak perlu menambahkan Environment Variables.
+6. Klik **Deploy**.
+
+Dataset Excel tidak dibaca saat runtime Vercel. Aplikasi menggunakan
+`src/data/tourism.json` yang sudah tersedia di repository. Jika Excel berubah,
+jalankan `npm run convert:data`, commit hasil JSON, lalu push kembali agar
+Vercel melakukan deployment ulang.
