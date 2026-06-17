@@ -4,78 +4,148 @@ Website penelitian berjudul **Data Mining Pada Pola Kunjungan Wisatawan Mengguna
 
 ## Tech Stack
 
-- Next.js App Router (JavaScript)
-- React
+- Next.js App Router
+- React JavaScript JSX
 - Tailwind CSS
 - Recharts
 - Lucide React
-- K-Means Clustering dengan JavaScript
+- K-Means Clustering JavaScript
+- Supabase PostgreSQL
+- Vercel
 
-## Instalasi
+## Setup Supabase
+
+1. Buka Supabase Dashboard.
+2. Buat project baru.
+3. Masuk ke menu SQL Editor.
+4. Jalankan isi file `database/supabase_schema.sql`.
+5. Masuk ke menu Project Settings.
+6. Ambil Project URL, anon/public key, dan service_role key.
+7. Masukkan ke file `.env.local`.
+8. Pastikan RLS aktif pada tabel `admins` dan `tourism_data`.
+9. Pastikan policy public read untuk `tourism_data` sudah ada.
+10. Pastikan policy service_role untuk `admins` dan `tourism_data` sudah ada.
+
+Isi `.env.local`:
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+JWT_SECRET=change_this_secret_key
+```
+
+## Import Dataset
+
+Dataset awal ada di:
+
+```text
+public/datasets/Dataset.xlsx
+```
+
+Generate SQL dari Excel:
+
+```bash
+npm run db:generate-sql:reset
+```
+
+Lalu jalankan isi file ini di Supabase SQL Editor:
+
+```text
+database/tourism_data_seed.sql
+```
+
+Alternatif import langsung ke Supabase:
+
+```bash
+npm run db:import-excel:reset
+```
+
+Script import/generate akan membaca semua baris valid dari Excel, mengubah bulan angka `1..12` menjadi `Januari..Desember`, dan menormalisasi kolom flag `Musim Libur (0/1)` serta `Libur Nasional (0/1)` menjadi nilai `0` atau `1`.
+
+## Seed Admin
+
+```bash
+npm run db:seed-admin
+```
+
+Default admin:
+
+```text
+username: admin
+password: admin123
+```
+
+## Menjalankan Project
 
 ```bash
 npm install
+npm run db:generate-sql:reset
+npm run db:seed-admin
 npm run dev
 ```
 
-Buka `http://localhost:3000` pada browser.
+Public:
+
+```text
+http://localhost:3000
+```
+
+Admin:
+
+```text
+http://localhost:3000/admin/login
+```
 
 ## Perintah
 
 ```bash
 npm run convert:data
+npm run db:generate-sql
+npm run db:generate-sql:reset
+npm run db:seed-admin
+npm run db:import-excel
+npm run db:import-excel:reset
 npm run dev
 npm run build
 npm run start
 ```
 
-`npm run convert:data` membaca `public/datasets/Dataset.xlsx` dan membentuk
-`src/data/tourism.json` dari sheet pertama. Jalankan kembali perintah tersebut
-setiap kali file Excel diperbarui.
+## Alur Data
+
+```text
+Supabase PostgreSQL
+API /api/tourism
+Halaman public
+K-Means JavaScript
+Cluster Sepi / Sedang / Ramai
+Grafik dan rekomendasi
+```
+
+Halaman `/`, `/dataset`, `/clustering`, `/results`, dan `/recommendations` memakai data dari `/api/tourism`. File Excel tidak dibaca sebagai sumber data runtime.
+
+Fitur clustering memakai `jumlah_kunjungan`, `musim_libur`, dan `libur_nasional` dengan K = 3. Label cluster ditentukan dari rata-rata kunjungan: terendah Sepi, tengah Sedang, tertinggi Ramai.
 
 ## Struktur Folder
 
 ```text
-public/
-  datasets/       # File Excel asli
-src/
-  app/            # Route dan layout Next.js
-  components/     # Komponen UI reusable
-  constants/      # Konstanta route dan cluster
-  data/           # Dataset JSON
-  lib/            # K-Means, normalisasi, statistik, rekomendasi
-  utils/          # Formatter
-scripts/          # Konversi Excel menjadi JSON
+database/         # SQL schema dan SQL seed dataset
+public/datasets/  # File Excel asli
+scripts/          # Generate SQL, seed admin, dan import Excel
+src/app/          # Route, API route, dan halaman Next.js
+src/components/   # Komponen UI dan admin
+src/lib/          # K-Means, Supabase client, auth, statistik, rekomendasi
+src/utils/        # Formatter
 ```
-
-## Dataset dan K-Means
-
-Data aplikasi dibaca dari `src/data/tourism.json` yang dihasilkan dari
-`public/datasets/Dataset.xlsx`. Fitur clustering terdiri dari
-`jumlah_kunjungan`, `musim_libur`, dan `libur_nasional`. Data dinormalisasi
-sebelum diproses dengan K = 3, lalu cluster diberi label Sepi, Sedang, dan
-Ramai berdasarkan rata-rata jumlah kunjungan.
 
 ## Deployment Vercel
 
-Project sudah dikonfigurasi melalui `vercel.json`:
+1. Import repository ke Vercel.
+2. Pastikan Framework Preset adalah Next.js.
+3. Isi Environment Variables sesuai `.env.example`.
+4. Jalankan `database/supabase_schema.sql` di Supabase.
+5. Jalankan `database/tourism_data_seed.sql` di Supabase atau gunakan `npm run db:import-excel:reset`.
+6. Jalankan `npm run db:seed-admin`.
+7. Deploy.
 
-- Framework: **Next.js**
-- Install command: `npm ci`
-- Build command: `npm run build`
-- Node.js: `24.x`
-- Output directory: otomatis dikelola oleh preset Next.js
-
-Langkah deployment:
-
-1. Buka [Vercel](https://vercel.com/new).
-2. Import repository `zri12/sumut-tourism-analytics`.
-3. Pastikan **Root Directory** adalah root repository.
-4. Biarkan Framework Preset sebagai **Next.js**.
-5. Tidak perlu menambahkan Environment Variables.
-6. Klik **Deploy**.
-
-Dataset Excel tidak dibaca saat runtime Vercel. Aplikasi menggunakan
-`src/data/tourism.json` yang sudah tersedia di repository. Jika Excel berubah,
-jalankan `npm run convert:data`, commit hasil JSON, lalu push kembali agar
-Vercel melakukan deployment ulang.
+Service role key hanya dipakai di API route server-side dan script lokal. Jangan gunakan `SUPABASE_SERVICE_ROLE_KEY` di client component.

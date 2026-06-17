@@ -4,6 +4,14 @@ import Badge from "@/components/ui/Badge";
 import { formatNumber } from "@/utils/formatter";
 
 export default function ResultInsights({ data }) {
+  if (!data.length) {
+    return (
+      <Card className="p-5 text-sm text-slate-500">
+        Data clustering belum tersedia. Pastikan environment Supabase sudah diisi dan tabel tourism_data memiliki data.
+      </Card>
+    );
+  }
+
   const sorted = [...data].sort((a, b) => b.jumlah_kunjungan - a.jumlah_kunjungan);
   const crowded = sorted[0];
   const least = sorted[sorted.length - 1];

@@ -5,6 +5,7 @@ import { CLUSTERS } from "@/constants/clusters";
 
 export default function ClusterSummaryCard({ label, data, total }) {
   const members = data.filter((item) => item.cluster_label === label);
+  const percentage = total ? Math.round((members.length / total) * 100) : 0;
   const average = Math.round(
     members.reduce((sum, item) => sum + item.jumlah_kunjungan, 0) /
       Math.max(members.length, 1),
@@ -18,7 +19,7 @@ export default function ClusterSummaryCard({ label, data, total }) {
       <div className="flex items-center justify-between">
         <Badge variant={label}>{label}</Badge>
         <span className="text-xs font-semibold text-slate-400">
-          {Math.round((members.length / total) * 100)}%
+          {percentage}%
         </span>
       </div>
       <p className="mt-5 text-2xl font-bold text-slate-900">{members.length} records</p>

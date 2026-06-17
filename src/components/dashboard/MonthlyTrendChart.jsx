@@ -4,19 +4,15 @@ import {
   Area,
   AreaChart,
   CartesianGrid,
-  ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
-import { useEffect, useState } from "react";
 import Card from "@/components/ui/Card";
+import ChartFrame from "@/components/ui/ChartFrame";
 import { formatNumber } from "@/utils/formatter";
 
 export default function MonthlyTrendChart({ data, title = "Monthly Visitor Trend" }) {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
-
   return (
     <Card className="p-5 sm:p-6">
       <div className="mb-6">
@@ -25,9 +21,9 @@ export default function MonthlyTrendChart({ data, title = "Monthly Visitor Trend
           Total kunjungan bulanan dari seluruh observasi.
         </p>
       </div>
-      <div className="h-72 w-full">
-        {mounted ? <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={data} margin={{ left: -15, right: 8 }}>
+      <ChartFrame className="h-72 w-full">
+        {({ width, height }) => (
+          <AreaChart width={width} height={height} data={data} margin={{ left: -15, right: 8 }}>
             <defs>
               <linearGradient id="visitColor" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#2563EB" stopOpacity={0.2} />
@@ -40,8 +36,8 @@ export default function MonthlyTrendChart({ data, title = "Monthly Visitor Trend
             <Tooltip formatter={(value) => [`${formatNumber(value)} kunjungan`, "Total"]} />
             <Area type="monotone" dataKey="jumlah_kunjungan" stroke="#2563EB" strokeWidth={2.5} fill="url(#visitColor)" />
           </AreaChart>
-        </ResponsiveContainer> : <div className="h-full w-full rounded-xl bg-slate-50" />}
-      </div>
+        )}
+      </ChartFrame>
     </Card>
   );
 }

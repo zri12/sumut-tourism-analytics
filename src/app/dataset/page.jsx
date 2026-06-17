@@ -1,10 +1,12 @@
 import { Database } from "lucide-react";
 import DatasetExplorer from "@/components/dataset/DatasetExplorer";
-import tourismData from "@/data/tourism.json";
+import { fetchTourismDataFromApi } from "@/lib/fetchTourismData";
 
 export const metadata = { title: "Dataset" };
+export const dynamic = "force-dynamic";
 
-export default function DatasetPage() {
+export default async function DatasetPage() {
+  const tourismData = await fetchTourismDataFromApi();
   return (
     <div className="page-shell">
       <div className="mb-7">

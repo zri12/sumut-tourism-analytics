@@ -5,11 +5,14 @@ import InsightPanel from "@/components/dashboard/InsightPanel";
 import ResearchSummary from "@/components/dashboard/ResearchSummary";
 import ClusterDistribution from "@/components/dashboard/ClusterDistribution";
 import RecentAnalysis from "@/components/dashboard/RecentAnalysis";
-import tourismData from "@/data/tourism.json";
 import { getClusterDistribution, getMonthlyTrend } from "@/lib/statistics";
 import { kMeans } from "@/lib/kmeans";
+import { fetchTourismDataFromApi } from "@/lib/fetchTourismData";
 
-export default function DashboardPage() {
+export const dynamic = "force-dynamic";
+
+export default async function DashboardPage() {
+  const tourismData = await fetchTourismDataFromApi();
   const monthlyData = getMonthlyTrend(tourismData);
   const { results } = kMeans(tourismData);
   const distribution = getClusterDistribution(results);

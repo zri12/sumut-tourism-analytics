@@ -5,13 +5,15 @@ import ClusterResultTable from "@/components/results/ClusterResultTable";
 import ClusterPieChart from "@/components/results/ClusterPieChart";
 import ClusterBarChart from "@/components/results/ClusterBarChart";
 import ResultInsights from "@/components/results/ResultInsights";
-import tourismData from "@/data/tourism.json";
 import { kMeans } from "@/lib/kmeans";
 import { getClusterDistribution } from "@/lib/statistics";
+import { fetchTourismDataFromApi } from "@/lib/fetchTourismData";
 
 export const metadata = { title: "Hasil Clustering" };
+export const dynamic = "force-dynamic";
 
-export default function ResultsPage() {
+export default async function ResultsPage() {
+  const tourismData = await fetchTourismDataFromApi();
   const { results } = kMeans(tourismData);
   const distribution = getClusterDistribution(results);
   const chartData = Object.entries(distribution).map(([name, value]) => ({ name, value }));

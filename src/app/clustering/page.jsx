@@ -3,13 +3,15 @@ import Card from "@/components/ui/Card";
 import ClusterFlow from "@/components/clustering/ClusterFlow";
 import ClusterCategoryCard from "@/components/clustering/ClusterCategoryCard";
 import ClusteringProcess from "@/components/clustering/ClusteringProcess";
-import tourismData from "@/data/tourism.json";
 import { kMeans } from "@/lib/kmeans";
 import { getClusterDistribution } from "@/lib/statistics";
+import { fetchTourismDataFromApi } from "@/lib/fetchTourismData";
 
 export const metadata = { title: "Clustering" };
+export const dynamic = "force-dynamic";
 
-export default function ClusteringPage() {
+export default async function ClusteringPage() {
+  const tourismData = await fetchTourismDataFromApi();
   const clustering = kMeans(tourismData);
   const distribution = getClusterDistribution(clustering.results);
   return (

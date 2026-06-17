@@ -5,7 +5,6 @@ import RecommendationTimeline from "@/components/recommendations/RecommendationT
 import ConclusionPanel from "@/components/recommendations/ConclusionPanel";
 import RecommendationTrendChart from "@/components/recommendations/RecommendationTrendChart";
 import TourismInsight from "@/components/recommendations/TourismInsight";
-import tourismData from "@/data/tourism.json";
 import { kMeans } from "@/lib/kmeans";
 import {
   generateRecommendationSummary,
@@ -14,10 +13,13 @@ import {
   getPeakMonths,
 } from "@/lib/recommendation";
 import { getMonthlyTrend } from "@/lib/statistics";
+import { fetchTourismDataFromApi } from "@/lib/fetchTourismData";
 
 export const metadata = { title: "Rekomendasi" };
+export const dynamic = "force-dynamic";
 
-export default function RecommendationsPage() {
+export default async function RecommendationsPage() {
+  const tourismData = await fetchTourismDataFromApi();
   const { results } = kMeans(tourismData);
   const bestMonths = getBestVisitMonths(results);
   const peakMonths = getPeakMonths(results);
