@@ -1,32 +1,42 @@
-# Data Mining Pola Kunjungan Wisatawan
+# Data Mining Pola Kunjungan Wisatawan Sumatera Utara
 
-Website penelitian berjudul **Data Mining Pada Pola Kunjungan Wisatawan Menggunakan Algoritma K-Means Clustering untuk Rekomendasi Waktu Berkunjung Ideal di Destinasi Sumatera Utara**.
+Website penelitian untuk menganalisis pola kunjungan wisatawan menggunakan algoritma **K-Means Clustering** dan menghasilkan rekomendasi waktu berkunjung ideal pada destinasi wisata di Sumatera Utara.
+
+## Fitur Utama
+
+- Dashboard ringkasan kunjungan wisatawan.
+- Eksplorasi dataset berdasarkan destinasi, wilayah, bulan, dan tahun.
+- Proses clustering K-Means dengan K = 3.
+- Visualisasi hasil cluster Sepi, Sedang, dan Ramai.
+- Rekomendasi waktu berkunjung berdasarkan hasil cluster dan tren bulanan.
+- Panel admin untuk login, melihat ringkasan, serta mengelola data wisata.
 
 ## Tech Stack
 
 - Next.js App Router
-- React JavaScript JSX
+- React
 - Tailwind CSS
 - Recharts
 - Lucide React
-- K-Means Clustering JavaScript
 - Supabase PostgreSQL
 - Vercel
 
-## Setup Supabase
+## Struktur Project
 
-1. Buka Supabase Dashboard.
-2. Buat project baru.
-3. Masuk ke menu SQL Editor.
-4. Jalankan isi file `database/supabase_schema.sql`.
-5. Masuk ke menu Project Settings.
-6. Ambil Project URL, anon/public key, dan service_role key.
-7. Masukkan ke file `.env.local`.
-8. Pastikan RLS aktif pada tabel `admins` dan `tourism_data`.
-9. Pastikan policy public read untuk `tourism_data` sudah ada.
-10. Pastikan policy service_role untuk `admins` dan `tourism_data` sudah ada.
+```text
+database/         SQL schema dan seed dataset
+public/datasets/  File Excel sumber dataset
+scripts/          Script generate SQL, import Excel, dan seed admin
+src/app/          Halaman dan API route Next.js
+src/components/   Komponen UI, dashboard, dataset, hasil, rekomendasi, admin
+src/constants/    Konstanta route dan cluster
+src/lib/          Supabase, auth admin, K-Means, statistik, rekomendasi
+src/utils/        Formatter tampilan
+```
 
-Isi `.env.local`:
+## Environment Variables
+
+Buat `.env.local` untuk development lokal atau isi Environment Variables di Vercel:
 
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
@@ -35,35 +45,21 @@ SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 JWT_SECRET=change_this_secret_key
 ```
 
-## Import Dataset
+`SUPABASE_SERVICE_ROLE_KEY` hanya dipakai di server/API route dan script lokal. Jangan gunakan key ini di client component.
 
-Dataset awal ada di:
+## Setup Database Supabase
 
-```text
-public/datasets/Dataset.xlsx
-```
-
-Generate SQL dari Excel:
+1. Buat project di Supabase.
+2. Buka SQL Editor.
+3. Jalankan `database/supabase_schema.sql`.
+4. Generate ulang seed dari Excel bila dataset berubah:
 
 ```bash
 npm run db:generate-sql:reset
 ```
 
-Lalu jalankan isi file ini di Supabase SQL Editor:
-
-```text
-database/tourism_data_seed.sql
-```
-
-Alternatif import langsung ke Supabase:
-
-```bash
-npm run db:import-excel:reset
-```
-
-Script import/generate akan membaca semua baris valid dari Excel, mengubah bulan angka `1..12` menjadi `Januari..Desember`, dan menormalisasi kolom flag `Musim Libur (0/1)` serta `Libur Nasional (0/1)` menjadi nilai `0` atau `1`.
-
-## Seed Admin
+5. Jalankan `database/tourism_data_seed.sql` di SQL Editor.
+6. Buat admin awal:
 
 ```bash
 npm run db:seed-admin
@@ -76,39 +72,31 @@ username: admin
 password: admin123
 ```
 
-## Menjalankan Project
+## Menjalankan Lokal
 
 ```bash
 npm install
-npm run db:generate-sql:reset
-npm run db:seed-admin
 npm run dev
 ```
 
-Public:
+URL aplikasi:
 
 ```text
-http://localhost:3000
+Public: http://localhost:3000
+Admin:  http://localhost:3000/admin/login
 ```
 
-Admin:
-
-```text
-http://localhost:3000/admin/login
-```
-
-## Perintah
+## Perintah NPM
 
 ```bash
-npm run convert:data
-npm run db:generate-sql
-npm run db:generate-sql:reset
-npm run db:seed-admin
-npm run db:import-excel
-npm run db:import-excel:reset
 npm run dev
 npm run build
 npm run start
+npm run db:generate-sql
+npm run db:generate-sql:reset
+npm run db:import-excel
+npm run db:import-excel:reset
+npm run db:seed-admin
 ```
 
 ## Alur Data
@@ -116,36 +104,22 @@ npm run start
 ```text
 Supabase PostgreSQL
 API /api/tourism
-Halaman public
+Halaman public dan dashboard admin
 K-Means JavaScript
 Cluster Sepi / Sedang / Ramai
-Grafik dan rekomendasi
+Grafik dan rekomendasi waktu kunjungan
 ```
 
-Halaman `/`, `/dataset`, `/clustering`, `/results`, dan `/recommendations` memakai data dari `/api/tourism`. File Excel tidak dibaca sebagai sumber data runtime.
+Halaman `/`, `/dataset`, `/clustering`, `/results`, dan `/recommendations` mengambil data dari Supabase melalui helper server-side. File Excel di `public/datasets/Dataset.xlsx` adalah sumber dataset untuk generate/import, bukan sumber data runtime aplikasi.
 
-Fitur clustering memakai `jumlah_kunjungan`, `musim_libur`, dan `libur_nasional` dengan K = 3. Label cluster ditentukan dari rata-rata kunjungan: terendah Sepi, tengah Sedang, tertinggi Ramai.
-
-## Struktur Folder
-
-```text
-database/         # SQL schema dan SQL seed dataset
-public/datasets/  # File Excel asli
-scripts/          # Generate SQL, seed admin, dan import Excel
-src/app/          # Route, API route, dan halaman Next.js
-src/components/   # Komponen UI dan admin
-src/lib/          # K-Means, Supabase client, auth, statistik, rekomendasi
-src/utils/        # Formatter
-```
+Clustering memakai atribut `jumlah_kunjungan`, `musim_libur`, dan `libur_nasional`. Label cluster ditentukan dari rata-rata kunjungan: cluster terendah menjadi Sepi, tengah menjadi Sedang, dan tertinggi menjadi Ramai.
 
 ## Deployment Vercel
 
-1. Import repository ke Vercel.
+1. Import repository ini ke Vercel.
 2. Pastikan Framework Preset adalah Next.js.
 3. Isi Environment Variables sesuai `.env.example`.
-4. Jalankan `database/supabase_schema.sql` di Supabase.
-5. Jalankan `database/tourism_data_seed.sql` di Supabase atau gunakan `npm run db:import-excel:reset`.
-6. Jalankan `npm run db:seed-admin`.
-7. Deploy.
+4. Pastikan database Supabase sudah berisi schema, seed data, dan admin.
+5. Deploy.
 
-Service role key hanya dipakai di API route server-side dan script lokal. Jangan gunakan `SUPABASE_SERVICE_ROLE_KEY` di client component.
+Konfigurasi Vercel sudah tersedia di `vercel.json` dengan `npm ci` sebagai install command dan `npm run build` sebagai build command.
