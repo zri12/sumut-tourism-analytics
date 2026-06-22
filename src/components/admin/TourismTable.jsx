@@ -10,7 +10,7 @@ export default function TourismTable({ data, onEdit, onDelete, startIndex = 0, l
       <table className="min-w-full divide-y divide-slate-100 text-sm">
         <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
           <tr>
-            {["No", "Kabupaten/Kota", "Destinasi Wisata", "Tahun", "Bulan", "Jumlah Kunjungan", "Musim Libur", "Libur Nasional", "Aksi"].map((header) => (
+            {["No", "Kabupaten/Kota", "Destinasi Wisata", "Tahun", "Bulan", "Jumlah Kunjungan", "Musim Libur", "Hari Libur Nasional", "Aksi"].map((header) => (
               <th key={header} className="px-4 py-3">{header}</th>
             ))}
           </tr>

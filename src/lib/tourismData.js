@@ -99,7 +99,9 @@ export function validateTourismPayload(payload) {
     errors.jumlah_kunjungan = "Jumlah kunjungan wajib angka dan tidak boleh negatif.";
   }
   if (![0, 1].includes(data.musim_libur)) errors.musim_libur = "Musim libur harus 0 atau 1.";
-  if (![0, 1].includes(data.libur_nasional)) errors.libur_nasional = "Libur nasional harus 0 atau 1.";
+  if (!Number.isInteger(data.libur_nasional) || data.libur_nasional < 0) {
+    errors.libur_nasional = "Jumlah hari libur nasional wajib angka dan tidak boleh negatif.";
+  }
 
   return {
     data,

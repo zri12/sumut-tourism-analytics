@@ -28,8 +28,6 @@ const toNumber = (value) => {
   return Number.isFinite(number) ? number : 0;
 };
 
-const toBinary = (value) => (toNumber(value) === 0 ? 0 : 1);
-
 const MONTHS = [
   "Januari",
   "Februari",
@@ -56,14 +54,37 @@ const normalizeMonth = (value) => {
   return match || text;
 };
 
+const getValue = (row, names) => {
+  for (const name of names) {
+    if (Object.prototype.hasOwnProperty.call(row, name)) return row[name];
+  }
+  return "";
+};
+
+const readRows = (sheet) => {
+  const matrix = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "", raw: true });
+  const headerIndex = matrix.findIndex((row) =>
+    row.some((cell) => ["Kabupaten/Kota", "Kabupaten / Kota"].includes(String(cell).trim())),
+  );
+
+  if (headerIndex < 0) {
+    throw new Error("Header Kabupaten/Kota tidak ditemukan pada sheet pertama.");
+  }
+
+  const headers = matrix[headerIndex].map((header) => String(header).trim());
+  return matrix.slice(headerIndex + 1).map((values) =>
+    Object.fromEntries(headers.map((header, index) => [header, values[index] ?? ""])),
+  );
+};
+
 const normalize = (row) => ({
-  kabupaten_kota: String(row["Kabupaten/Kota"] || "").trim(),
-  destinasi_wisata: String(row["Destinasi Wisata"] || "").trim(),
-  tahun: toNumber(row["Tahun"]),
-  bulan: normalizeMonth(row["Bulan"]),
-  jumlah_kunjungan: toNumber(row["Jumlah Kunjungan"]),
-  musim_libur: toBinary(row["Musim Libur (0/1)"]),
-  libur_nasional: toBinary(row["Libur Nasional (0/1)"]),
+  kabupaten_kota: String(getValue(row, ["Kabupaten/Kota", "Kabupaten / Kota"])).trim(),
+  destinasi_wisata: String(getValue(row, ["Destinasi Wisata"])).trim(),
+  tahun: toNumber(getValue(row, ["Tahun"])),
+  bulan: normalizeMonth(getValue(row, ["Bulan", "Nama Bulan", "No. Bulan"])),
+  jumlah_kunjungan: toNumber(getValue(row, ["Jumlah Kunjungan", "Jumlah Kunjungan (Orang)"])),
+  musim_libur: toNumber(getValue(row, ["Musim Libur (0/1)", "Musim Libur Sekolah (0/1)"])),
+  libur_nasional: toNumber(getValue(row, ["Libur Nasional (0/1)", "Jumlah Hari Libur Nasional"])),
 });
 
 const rowKey = (row) =>
@@ -78,13 +99,13 @@ const rowKey = (row) =>
   ].join("|");
 
 async function main() {
-  const excelPath = path.join(process.cwd(), "public", "datasets", "Dataset.xlsx");
+  const excelPath = path.join(path.resolve(__dirname, ".."), "public", "datasets", "Dataset.xlsx");
   const workbook = XLSX.readFile(excelPath);
   const sheet = workbook.Sheets[workbook.SheetNames[0]];
-  const rows = XLSX.utils.sheet_to_json(sheet);
+  const rows = readRows(sheet);
   const mapped = rows
     .map(normalize)
-    .filter((row) => row.kabupaten_kota && row.destinasi_wisata && row.bulan);
+    .filter((row) => row.kabupaten_kota && row.destinasi_wisata && row.tahun && row.bulan);
 
   const uniqueRows = [...new Map(mapped.map((row) => [rowKey(row), row])).values()];
 

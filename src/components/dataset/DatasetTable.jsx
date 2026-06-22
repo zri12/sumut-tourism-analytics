@@ -13,7 +13,7 @@ export default function DatasetTable({ data }) {
           <TableHeader>Bulan</TableHeader>
           <TableHeader>Kunjungan</TableHeader>
           <TableHeader>Musim Libur</TableHeader>
-          <TableHeader>Libur Nasional</TableHeader>
+          <TableHeader>Hari Libur Nasional</TableHeader>
         </tr>
       </TableHead>
       <tbody className="divide-y divide-slate-100">
@@ -26,7 +26,7 @@ export default function DatasetTable({ data }) {
             <TableCell>{item.bulan}</TableCell>
             <TableCell className="font-semibold text-slate-800">{formatNumber(item.jumlah_kunjungan)}</TableCell>
             <TableCell>{formatBoolean(item.musim_libur)}</TableCell>
-            <TableCell>{formatBoolean(item.libur_nasional)}</TableCell>
+            <TableCell>{formatNumber(item.libur_nasional)}</TableCell>
           </tr>
         ))}
       </tbody>

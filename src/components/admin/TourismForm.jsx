@@ -49,11 +49,8 @@ export default function TourismForm({ form, setForm, errors = {}, onCancel, onSu
             <option value={1}>1 - Ya</option>
           </select>
         </Field>
-        <Field label="Libur Nasional" error={errors.libur_nasional}>
-          <select className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none" value={form.libur_nasional} onChange={(event) => update("libur_nasional", event.target.value)}>
-            <option value={0}>0 - Tidak</option>
-            <option value={1}>1 - Ya</option>
-          </select>
+        <Field label="Jumlah Hari Libur Nasional" error={errors.libur_nasional}>
+          <Input type="number" min="0" value={form.libur_nasional} onChange={(event) => update("libur_nasional", event.target.value)} />
         </Field>
       </div>
       <div className="flex justify-end gap-2 pt-2">
