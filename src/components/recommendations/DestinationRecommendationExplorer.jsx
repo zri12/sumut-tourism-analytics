@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import {
   CalendarCheck2,
+  ChevronDown,
   MapPin,
   Search,
   Sparkles,
@@ -27,7 +28,14 @@ export default function DestinationRecommendationExplorer({ data }) {
     () => [...new Set(data.map((item) => item.destinasi_wisata).filter(Boolean))].sort(),
     [data],
   );
-  const [query, setQuery] = useState(destinations[0] || "");
+  const [query, setQuery] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
+  const filteredDestinations = useMemo(() => {
+    const keyword = query.trim().toLowerCase();
+    return destinations.filter(
+      (item) => !keyword || item.toLowerCase().includes(keyword),
+    );
+  }, [destinations, query]);
   const selectedDestination = destinations.find(
     (item) => item.toLowerCase() === query.trim().toLowerCase(),
   );
@@ -45,19 +53,80 @@ export default function DestinationRecommendationExplorer({ data }) {
         <p className="mt-1 text-xs leading-5 text-slate-500">
           Ketik atau pilih destinasi untuk melihat waktu ideal dan gaya perjalanan yang sesuai.
         </p>
-        <div className="relative mt-4 max-w-2xl">
-          <Search className="absolute left-3.5 top-3.5 text-slate-400" size={17} />
-          <Input
-            id="destination-search"
-            list="destination-options"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Contoh: Istana Maimun"
-            className="pl-10"
-          />
-          <datalist id="destination-options">
-            {destinations.map((item) => <option key={item} value={item} />)}
-          </datalist>
+        <div
+          className="relative mt-4 max-w-2xl"
+          onBlur={(event) => {
+            if (!event.currentTarget.contains(event.relatedTarget)) setIsOpen(false);
+          }}
+        >
+          <div className="relative">
+            <Search
+              className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+              size={18}
+            />
+            <Input
+              id="destination-search"
+              value={query}
+              onFocus={() => setIsOpen(true)}
+              onChange={(event) => {
+                setQuery(event.target.value);
+                setIsOpen(true);
+              }}
+              onKeyDown={(event) => {
+                if (event.key === "Escape") setIsOpen(false);
+              }}
+              placeholder="Ketik nama destinasi wisata..."
+              className="h-14 pl-10 pr-11"
+              autoComplete="off"
+              role="combobox"
+              aria-autocomplete="list"
+              aria-expanded={isOpen}
+              aria-controls="destination-options"
+            />
+            <button
+              type="button"
+              aria-label="Buka daftar destinasi"
+              onClick={() => setIsOpen((value) => !value)}
+              className="absolute right-2 top-2 grid h-10 w-10 place-items-center rounded-lg text-slate-500 transition hover:bg-slate-100"
+            >
+              <ChevronDown className={`transition-transform ${isOpen ? "rotate-180" : ""}`} size={18} />
+            </button>
+          </div>
+
+          {isOpen && (
+            <div
+              id="destination-options"
+              role="listbox"
+              className="destination-results absolute left-0 right-0 z-30 mt-2 max-h-72 overflow-y-auto rounded-xl border border-slate-200 bg-white p-2 shadow-xl shadow-slate-900/10"
+            >
+              {filteredDestinations.length ? (
+                filteredDestinations.map((item) => (
+                  <button
+                    key={item}
+                    type="button"
+                    role="option"
+                    aria-selected={item === selectedDestination}
+                    onClick={() => {
+                      setQuery(item);
+                      setIsOpen(false);
+                    }}
+                    className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm transition ${
+                      item === selectedDestination
+                        ? "bg-blue-50 font-semibold text-blue-700"
+                        : "text-slate-700 hover:bg-slate-50"
+                    }`}
+                  >
+                    <MapPin className="shrink-0 text-slate-400" size={16} />
+                    <span className="truncate">{item}</span>
+                  </button>
+                ))
+              ) : (
+                <div className="px-3 py-5 text-center text-sm text-slate-500">
+                  Destinasi tidak ditemukan.
+                </div>
+              )}
+            </div>
+          )}
         </div>
         {!recommendation && query && (
           <p className="mt-3 text-sm text-amber-700">

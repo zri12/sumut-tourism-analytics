@@ -13,9 +13,9 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="id">
-      <body>
+      <body className="flex min-h-screen flex-col">
         <TopNav />
-        <main>{children}</main>
+        <main className="flex-1">{children}</main>
         <footer className="border-t border-slate-200 bg-white">
           <div className="mx-auto flex max-w-7xl flex-col items-center gap-1 px-4 py-6 text-center text-xs text-slate-500 sm:px-6 lg:px-8">
             <p className="font-semibold text-slate-700">Sistem Analisis Pola Kunjungan Wisatawan</p>

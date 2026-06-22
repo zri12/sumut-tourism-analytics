@@ -23,6 +23,32 @@ body {
     sans-serif;
 }
 
+.destination-results {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+.destination-results::-webkit-scrollbar {
+  width: 8px;
+}
+
+.destination-results::-webkit-scrollbar-track {
+  margin-block: 8px;
+  background: transparent;
+}
+
+.destination-results::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: #cbd5e1;
+  background-clip: padding-box;
+}
+
+.destination-results::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+  background-clip: padding-box;
+}
+
 ::selection {
   background: #dbeafe;
   color: #172554;
